@@ -4,6 +4,7 @@ using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnakeGame;
 using SnakeGame.Utils;
+using Moq;
 
 namespace SnakeTest
 {
@@ -47,7 +48,7 @@ namespace SnakeTest
             {
                 for (int y = 0; y < grid.Height; y++)
                 {
-                    grid.PositionPlayer(x, y); 
+                    grid.SetPlayerPosition(x, y); 
 
                     Assert.IsFalse(grid.PlayerOutOfBounds());
                 }
@@ -57,16 +58,16 @@ namespace SnakeTest
         [TestMethod]
         public void TestPositionPlayerOutOfBounds()
         {
-            grid.PositionPlayer(-1, 0);
+            grid.SetPlayerPosition(-1, 0);
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.PositionPlayer(0, -1); 
+            grid.SetPlayerPosition(0, -1); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.PositionPlayer(grid.Width, 0); 
+            grid.SetPlayerPosition(grid.Width, 0); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.PositionPlayer(0, grid.Height); 
+            grid.SetPlayerPosition(0, grid.Height); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
         }
 
@@ -89,7 +90,9 @@ namespace SnakeTest
 
         public void VerifyStepInDirectionMovesPlayer(Direction dir)
         {
-            var playerPosition = grid.GetPlayerPosition();
+            var playerPosition = new IntVector2(5,5);
+            grid.SetPlayerPosition(playerPosition.X, playerPosition.Y);
+
             var expectedPosition = playerPosition + dir.UnitVector();
 
             grid.SetPlayerDirection(dir);

@@ -24,11 +24,14 @@ namespace SnakeGame
         public void Step()
         {
             MovePlayer(_playerDirection);
+
+            if (PlayerOutOfBounds())
+                ResetPlayer();
         }
 
         public void ResetPlayer()
         {
-            PositionPlayer(0, 0);
+            SetPlayerPosition(0, 0);
             SetPlayerDirection(Direction.Right);
         }
 
@@ -42,7 +45,7 @@ namespace SnakeGame
             _player += d.UnitVector();
         }
 
-        public void PositionPlayer(int x, int y)
+        public void SetPlayerPosition(int x, int y)
         {
             _player = new IntVector2(x, y);
         }
