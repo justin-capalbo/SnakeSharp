@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnakeGame;
 using SnakeGame.Utils;
@@ -30,19 +31,81 @@ namespace SnakeTest
         }
 
         [TestMethod]
+        public void TestCannotTurn180DegreesIfBig()
+        {
+            _player.Eat();
+            foreach (Direction dir in Enum.GetValues(typeof(Direction)))
+            {
+                VerifyCannotTurnAround(dir);
+            }
+        }
+
+        [TestMethod]
+        public void TestCanTurn180DegreesWithNoTail()
+        {
+            foreach (Direction dir in Enum.GetValues(typeof(Direction)))
+            {
+                VerifyCanTurnAround(dir);
+            }
+        }
+
+        private void VerifyCannotTurnAround(Direction startDirection)
+        {
+            _player.SetDirectionForced(startDirection);
+            _player.TurnTowards(startDirection.Opposite());
+
+            Assert.AreEqual(startDirection, _player.GetDirection());
+        }
+
+        private void VerifyCanTurnAround(Direction startDirection)
+        {
+            _player.SetDirectionForced(startDirection);
+            _player.TurnTowards(startDirection.Opposite());
+
+            Assert.AreEqual(startDirection.Opposite(), _player.GetDirection());
+        }
+
+        [TestMethod]
         public void TestAddTail()
         {
-            int oldSize = _player.Size;
-            _player.Grow();
+            int oldSize = _player.TailSize;
+            _player.Eat();
 
-            Assert.AreEqual(oldSize + 1, _player.Size);
+            Assert.AreEqual(oldSize + 1, _player.TailSize);
         }
 
         [TestMethod]
         public void TestRemoveTail()
         {
             _player.RemoveTail();
-            Assert.AreEqual(1, _player.Size);
+
+            Assert.AreEqual(0, _player.TailSize);
+        }
+
+        [TestMethod]
+        public void TestLastTailOccupiesPlayerPreviousPosition()
+        {
+            var prevPlayerPosition = _player.GetPosition();
+
+            _player.Eat();
+            _player.Move();
+
+            Assert.IsTrue(prevPlayerPosition.Equals(_player.GetTail().Last()));
+
+        }
+        [TestMethod]
+        public void TestBigTailFollowsHead()
+        {
+            _player.Eat();
+            _player.Eat();
+            _player.Eat();
+            _player.Move();
+
+            var tailPosition = _player.GetPosition();
+            
+            _player.Move();
+
+            Assert.IsTrue(tailPosition.Equals(_player.GetTail().Last()));
         }
 
         [TestMethod]
@@ -59,9 +122,9 @@ namespace SnakeTest
             var initialPosition = new IntVector2(5,5);
             _player.SetPosition(initialPosition.X, initialPosition.Y);
 
-            var expectedPosition = initialPosition + dir.UnitVector();
+            var expectedPosition = initialPosition + dir;
 
-            _player.SetDirection(dir);
+            _player.SetDirectionForced(dir);
             _player.Move();
 
             Assert.IsTrue(expectedPosition.Equals(_player.GetPosition()));

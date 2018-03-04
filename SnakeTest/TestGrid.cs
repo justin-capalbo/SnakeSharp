@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnakeGame;
+using SnakeGame.Utils;
 
 namespace SnakeTest
 {
@@ -46,11 +47,15 @@ namespace SnakeTest
         public void TestMovingOutOfBoundsResetsPlayer()
         {
             var expectedPosition = SnakeGrid.DefaultPlayerPosition;
+            var expectedDirection = SnakeGrid.DefaultPlayerDirection;
 
             player.SetPosition(0, MinOobY);
+            player.Eat();
             grid.Step();
             
             Assert.IsTrue(expectedPosition.Equals(player.GetPosition()));
+            Assert.IsTrue(expectedDirection.Equals(player.GetDirection()));
+            Assert.AreEqual(0, player.TailSize);
         }
 
         [TestMethod]
@@ -81,6 +86,50 @@ namespace SnakeTest
 
             player.SetPosition(0, grid.Height); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
+        }
+
+        [TestMethod]
+        public void TestAppleGrowsPlayer()
+        {
+            var expectedTailSize = player.TailSize + 1;
+            PlaceAppleInFrontOfPlayer();
+
+            grid.Step();
+
+            Assert.AreEqual(expectedTailSize, player.TailSize);
+        }
+
+        [TestMethod]
+        public void TestPlayerCollidingSelfResetsPlayer()
+        {
+            var expectedPosition = SnakeGrid.DefaultPlayerPosition;
+
+            for (int i = 0; i < 5; i++)
+            {
+                PlaceAppleInFrontOfPlayer();
+                grid.Step();
+            }
+
+            WalkInACircle();
+
+            Assert.AreEqual(0, player.TailSize);
+            Assert.IsTrue(expectedPosition.Equals(player.GetPosition()));
+        }
+
+        private void WalkInACircle()
+        {
+            player.TurnTowards(Direction.Down);
+            grid.Step();
+            player.TurnTowards(Direction.Left);
+            grid.Step();
+            player.TurnTowards(Direction.Up);
+            grid.Step();
+        }
+
+        private void PlaceAppleInFrontOfPlayer()
+        {
+            var applePosition = player.GetPosition() + player.GetDirection();
+            grid.SetApple(applePosition.X, applePosition.Y);
         }
 
     }
