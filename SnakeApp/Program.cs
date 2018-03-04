@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Text;
 using SnakeGame;
 using System.Threading;
@@ -27,7 +26,8 @@ namespace SnakeApp
 
         public static void StartGame()
         {
-            grid = new SnakeGrid(20, 20);
+            var player = new Player();
+            grid = new SnakeGrid(20, 20, player);
             timer = new Timer(Tick, null, 0, 200);
 
             bool gameRunning = true;
@@ -36,16 +36,16 @@ namespace SnakeApp
                 switch (Console.ReadKey(true).Key)
                 {
                     case ConsoleKey.DownArrow:
-                        grid.SetPlayerDirection(Direction.Down);
+                        player.SetDirection(Direction.Down);
                         break;
                     case ConsoleKey.UpArrow:
-                        grid.SetPlayerDirection(Direction.Up);
+                        player.SetDirection(Direction.Up);
                         break;
                     case ConsoleKey.LeftArrow:
-                        grid.SetPlayerDirection(Direction.Left);
+                        player.SetDirection(Direction.Left);
                         break;
                     case ConsoleKey.RightArrow:
-                        grid.SetPlayerDirection(Direction.Right);
+                        player.SetDirection(Direction.Right);
                         break;
                     case ConsoleKey.Escape:
                         gameRunning = false;
@@ -60,7 +60,7 @@ namespace SnakeApp
             int X = grid.Width;
             int Y = grid.Height;
 
-            var playerPos = grid.GetPlayerPosition();
+            var playerPos = grid.Player.GetPosition();
 
             Console.SetCursorPosition(0, 0);
             Console.WriteLine(new string('=', X + 2));

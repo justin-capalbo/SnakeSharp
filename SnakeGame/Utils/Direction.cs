@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SnakeGame.Utils
+﻿namespace SnakeGame.Utils
 {
     public enum Direction
     {
-        Up,
-        Down,
+        Right,
         Left,
-        Right
+        Up,
+        Down
     }
 
     public static class DirectionExtensions

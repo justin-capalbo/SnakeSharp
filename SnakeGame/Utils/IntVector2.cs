@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SnakeGame.Utils
+﻿namespace SnakeGame.Utils
 {
     public class IntVector2
     {

@@ -1,64 +1,50 @@
-﻿using System;
-using System.Drawing;
-using System.Numerics;
-using System.Runtime.CompilerServices;
-using SnakeGame.Utils;
+﻿using SnakeGame.Utils;
 
 namespace SnakeGame
 {
-    public class SnakeGrid
+    public class SnakeGrid 
     {
         public int Width { get; }
         public int Height { get; }
 
-        private IntVector2 _player; 
-        private Direction _playerDirection;
+        public Player Player { get; }
 
-        public SnakeGrid(int x, int y)
+        public static IntVector2 DefaultPlayerPosition => new IntVector2(0,0);
+        public static Direction DefaultPlayerDirection => Direction.Right;
+
+        public SnakeGrid(int x, int y, Player p)
         {
             Width = x;
             Height = y;
+
+            Player = p;
             ResetPlayer();
         }
 
         public void Step()
         {
-            MovePlayer(_playerDirection);
+            Player.Move();
 
+            HandleCollision();
+        }
+
+        private void HandleCollision()
+        {
             if (PlayerOutOfBounds())
                 ResetPlayer();
         }
 
         public void ResetPlayer()
         {
-            SetPlayerPosition(0, 0);
-            SetPlayerDirection(Direction.Right);
-        }
-
-        public void SetPlayerDirection(Direction dir)
-        {
-            _playerDirection = dir;
-        }
-
-        public void MovePlayer(Direction d)
-        {
-            _player += d.UnitVector();
-        }
-
-        public void SetPlayerPosition(int x, int y)
-        {
-            _player = new IntVector2(x, y);
-        }
-
-        public IntVector2 GetPlayerPosition()
-        {
-            return _player;
+            Player.SetPosition(DefaultPlayerPosition.X, DefaultPlayerPosition.Y);
+            Player.SetDirection(DefaultPlayerDirection);
         }
 
         public bool PlayerOutOfBounds()
         {
-            return _player.X < 0 || _player.X >= Width ||
-                   _player.Y < 0 || _player.Y >= Height;
+            var playerPosition = Player.GetPosition();
+            return playerPosition.X < 0 || playerPosition.X >= Width ||
+                   playerPosition.Y < 0 || playerPosition.Y >= Height;
         }
     }
 

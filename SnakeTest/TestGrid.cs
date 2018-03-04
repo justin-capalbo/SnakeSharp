@@ -1,27 +1,28 @@
-using System;
-using System.Drawing;
-using System.Numerics;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SnakeGame;
-using SnakeGame.Utils;
-using Moq;
 
 namespace SnakeTest
 {
     [TestClass]
     public class TestGrid
     {
-        private const int StandardGridWidth = 30;
-        private const int StandardGridHeight = 30;
+        private const int StandardGridWidth = 30, StandardGridHeight = 30;
+        private const int MinOobX = -1, MinOobY = -1;
 
         private static SnakeGrid grid;
+        private static Player player;
 
-        private static SnakeGrid StandardGrid() => new SnakeGrid(StandardGridWidth, StandardGridHeight);
+        private static SnakeGrid MakeStandardGrid()
+        {
+            player = new Player();
+            return new SnakeGrid(StandardGridWidth, StandardGridHeight, player);
+        } 
 
         [TestInitialize]
         public void Initialize()
         {
-            grid = StandardGrid();
+            grid = MakeStandardGrid();
+            player = grid.Player;
         }
 
         [TestMethod]
@@ -34,11 +35,22 @@ namespace SnakeTest
         [TestMethod]
         public void TestGridStartsWithPlayerAtOrigin()
         {
-            var expectedPosition = new IntVector2(0, 0);
-            var playerPosition = grid.GetPlayerPosition();
+            var expectedPosition = SnakeGrid.DefaultPlayerPosition;
+            var playerPosition = player.GetPosition();
             
             Assert.AreEqual(expectedPosition.X, playerPosition.X);
             Assert.AreEqual(expectedPosition.Y, playerPosition.Y);
+        }
+
+        [TestMethod]
+        public void TestMovingOutOfBoundsResetsPlayer()
+        {
+            var expectedPosition = SnakeGrid.DefaultPlayerPosition;
+
+            player.SetPosition(0, MinOobY);
+            grid.Step();
+            
+            Assert.IsTrue(expectedPosition.Equals(player.GetPosition()));
         }
 
         [TestMethod]
@@ -48,7 +60,7 @@ namespace SnakeTest
             {
                 for (int y = 0; y < grid.Height; y++)
                 {
-                    grid.SetPlayerPosition(x, y); 
+                    player.SetPosition(x, y); 
 
                     Assert.IsFalse(grid.PlayerOutOfBounds());
                 }
@@ -58,47 +70,17 @@ namespace SnakeTest
         [TestMethod]
         public void TestPositionPlayerOutOfBounds()
         {
-            grid.SetPlayerPosition(-1, 0);
+            player.SetPosition(MinOobX, 0);
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.SetPlayerPosition(0, -1); 
+            player.SetPosition(0, MinOobY); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.SetPlayerPosition(grid.Width, 0); 
+            player.SetPosition(grid.Width, 0); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
 
-            grid.SetPlayerPosition(0, grid.Height); 
+            player.SetPosition(0, grid.Height); 
             Assert.IsTrue(grid.PlayerOutOfBounds());
-        }
-
-        [TestMethod]
-        public void TestCannotAddPlayerOutOfBounds()
-        {
-            grid.ResetPlayer();
-
-            Assert.IsFalse(grid.PlayerOutOfBounds());
-        }
-
-        [TestMethod]
-        public void TestStepMovesPlayerAllDimensions()
-        {
-            foreach (Direction dir in Enum.GetValues(typeof(Direction)))
-            {
-                VerifyStepInDirectionMovesPlayer(dir);
-            }
-        }
-
-        public void VerifyStepInDirectionMovesPlayer(Direction dir)
-        {
-            var playerPosition = new IntVector2(5,5);
-            grid.SetPlayerPosition(playerPosition.X, playerPosition.Y);
-
-            var expectedPosition = playerPosition + dir.UnitVector();
-
-            grid.SetPlayerDirection(dir);
-            grid.Step();
-
-            Assert.IsTrue(expectedPosition.Equals(grid.GetPlayerPosition()));
         }
 
     }
