@@ -11,6 +11,7 @@ namespace SnakeApp
     {
         private static Timer timer;
         private static SnakeGrid grid;
+        private static Player player;
 
         public static void Main(string[] args)
         {
@@ -27,7 +28,7 @@ namespace SnakeApp
 
         public static void StartGame()
         {
-            var player = new Player();
+            player = new Player();
             grid = new SnakeGrid(20, 20, player);
             timer = new Timer(Tick, null, 0, 200);
 
@@ -48,9 +49,6 @@ namespace SnakeApp
                     case ConsoleKey.RightArrow:
                         player.TurnTowards(Direction.Right);
                         break;
-                    case ConsoleKey.Spacebar:
-                        player.Eat();
-                        break;
                     case ConsoleKey.Escape:
                         gameRunning = false;
                         break;
@@ -59,13 +57,17 @@ namespace SnakeApp
             }
         }
 
+        /// <summary>
+        /// Draws the game.  Please don't judge me.
+        /// </summary>
+        /// <param name="grid"></param>
         public static void Render(SnakeGrid grid)
         {
             int X = grid.Width;
             int Y = grid.Height;
 
-            var playerPos = grid.Player.GetPosition();
-            var playerTail = grid.Player.GetTail();
+            var playerPos = player.GetPosition();
+            var playerTail = player.GetTail();
 
             Console.SetCursorPosition(0, 0);
             Console.WriteLine(new string('=', X + 2));

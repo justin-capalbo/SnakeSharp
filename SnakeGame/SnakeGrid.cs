@@ -8,7 +8,7 @@ namespace SnakeGame
         public int Width { get; }
         public int Height { get; }
 
-        public Player Player { get; }
+        private Player Player { get; }
 
         public static IntVector2 DefaultPlayerPosition => new IntVector2(0,0);
         public static Direction DefaultPlayerDirection => Direction.Right;
@@ -40,7 +40,7 @@ namespace SnakeGame
 
         private void HandleCollision()
         {
-            if (PlayerOutOfBounds())
+            if (PlayerOutOfBounds() || Player.IsCollidingWithSelf())
             {
                 ResetAll();
             }
@@ -50,14 +50,9 @@ namespace SnakeGame
                 Player.Eat();
                 ResetApple();
             }
-
-            if (Player.IsCollidingWithSelf())
-            {
-                ResetAll();
-            }
         }
 
-        public void ResetPlayer()
+        private void ResetPlayer()
         {
             Player.SetPosition(DefaultPlayerPosition.X, DefaultPlayerPosition.Y);
             Player.SetDirectionForced(DefaultPlayerDirection);
