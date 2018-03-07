@@ -12,6 +12,7 @@ namespace SnakeApp
         private static Timer timer;
         private static SnakeGrid grid;
         private static Player player;
+        private static int TimerFrequency = 200;
 
         public static void Main(string[] args)
         {
@@ -30,7 +31,7 @@ namespace SnakeApp
         {
             player = new Player();
             grid = new SnakeGrid(20, 20, player);
-            timer = new Timer(Tick, null, 0, 200);
+            timer = new Timer(Tick, null, 0, TimerFrequency);
 
             bool gameRunning = true;
             while (gameRunning)
